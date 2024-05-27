@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using GitHub.secile.Video;
+using UsbCameraLib;
+using UsbCameraLib.Wpf;
 
 namespace UsbCameraWpf
 {

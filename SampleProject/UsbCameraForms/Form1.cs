@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GitHub.secile.Video;
+using UsbCameraLib;
 
 namespace UsbCameraForms
 {
@@ -66,13 +66,13 @@ namespace UsbCameraForms
             camera.Start();
 
             // get bitmap.
-            button1.Click += (s, ev) => pictureBox2.Image = camera.GetBitmap();
+            button1.Click += (s, ev) => pictureBox2.Image = (Image)camera.GetBitmap();
 
             // still image
             if (camera.StillImageAvailable)
             {
                 button2.Click += (s, ev) => camera.StillImageTrigger();
-                camera.StillImageCaptured += bmp => pictureBox2.Image = bmp;
+                camera.StillImageCaptured += bmp => pictureBox2.Image = (Image)bmp;
             }
         }
     }
