@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using GitHub.secile.Video;
 
 namespace UsbCameraWpf
 {
@@ -41,26 +40,26 @@ namespace UsbCameraWpf
         public MainWindowViewModel()
         {
             // find device.
-            var devices = UsbCamera.FindDevices();
+            // Using fully qualified name due to namespace segment shadowing.
+            var devices = UsbCamera.Net.UsbCamera.FindDevices();
             if (devices.Length == 0) return; // no device.
 
             // get video format.
             var cameraIndex = 0;
-            var formats = UsbCamera.GetVideoFormat(cameraIndex);
+            var formats = UsbCamera.Net.UsbCamera.GetVideoFormat(cameraIndex);
 
             // select the format you want.
             for (int i = 0; i < formats.Length; i++) Console.WriteLine("{0}:{1}", i, formats[i]);
             var format = formats[0];
 
             // create instance.
-            var camera = new UsbCamera(cameraIndex, format);
+            var camera = new UsbCamera.Net.UsbCamera(cameraIndex, format);
 
             // to show preview, there are 3 ways.
             // 1. subscribe PreviewCaptured. (recommended.)
             camera.PreviewCaptured += (bmp) =>
             {
-                // passed image can only be used for preview with data binding.
-                // the image is single instance and updated by library. DO NOT USE for other purpose.
+                // Library currently built without USBCAMERA_WPF, convert System.Drawing.Bitmap to BitmapSource.
                 Preview = bmp;
             };
 

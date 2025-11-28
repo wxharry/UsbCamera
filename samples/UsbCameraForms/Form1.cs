@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GitHub.secile.Video;
 
 namespace UsbCameraForms
 {
@@ -21,19 +20,19 @@ namespace UsbCameraForms
         private void Form1_Load(object sender, EventArgs e)
         {
             // find device.
-            var devices = UsbCamera.FindDevices();
+            var devices = UsbCamera.Net.UsbCamera.FindDevices();
             if (devices.Length == 0) return; // no device.
 
             // get video format.
             var cameraIndex = 0;
-            var formats = UsbCamera.GetVideoFormat(cameraIndex);
+            var formats = UsbCamera.Net.UsbCamera.GetVideoFormat(cameraIndex);
 
             // select the format you want.
             for (int i = 0; i < formats.Length; i++) Console.WriteLine("{0}:{1}", i, formats[i]);
             var format = formats[0];
 
             // create instance.
-            var camera = new UsbCamera(cameraIndex, format);
+            var camera = new UsbCamera.Net.UsbCamera(cameraIndex, format);
             // this closing event handler make sure that the instance is not subject to garbage collection.
             this.FormClosing += (s, ev) => camera.Release(); // release when close.
 
