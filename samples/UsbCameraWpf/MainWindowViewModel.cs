@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;         // PixelFormats
 using System.Windows.Media.Imaging; // BitmapSource
+using UsbCamera;                    // UsbCameraDevice, VideoFormat
+using UsbCamera.Wpf;                // VideoFrame WPF extensions
 
 namespace UsbCameraWpf
 {
@@ -40,52 +42,62 @@ namespace UsbCameraWpf
 
         public MainWindowViewModel()
         {
-            // find device.
-            // Using fully qualified name due to namespace segment shadowing.
-            var devices = UsbCamera.Net.UsbCamera.FindDevices();
-            if (devices.Length == 0) return; // no device.
+            // Find devices via new core wrapper
+            var devices = UsbCameraDevice.FindDevices();
+            if (devices.Length == 0) return; // no device
 
-            // get video format.
             var cameraIndex = 0;
-            var formats = UsbCamera.Net.UsbCamera.GetVideoFormat(cameraIndex);
-
-            // select the format you want.
+            var formats = UsbCameraDevice.GetVideoFormats(cameraIndex);
             for (int i = 0; i < formats.Length; i++) Console.WriteLine("{0}:{1}", i, formats[i]);
-            var format = formats[0];
+            var format = formats.First();
 
-            // create instance.
-            var camera = new UsbCamera.Net.UsbCamera(cameraIndex, format);
+            // Create device using new VideoFrame-based API
+            var camera = new UsbCameraDevice(cameraIndex, format);
 
-            // to show preview, there are 3 ways.
-            // 1. subscribe PreviewCaptured. (recommended.)
-            camera.PreviewCapturedWPF += (bmp) =>
+            // High-performance preview: reuse WriteableBitmap when size matches
+            WriteableBitmap reusable = null;
+            camera.PreviewFrameCaptured += frame =>
             {
-                // Library currently built without USBCAMERA_WPF, convert System.Drawing.Bitmap to BitmapSource.
-                Preview = bmp;
+                // Marshal to UI thread for bitmap updates
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    // Create once or update in-place
+                    if (reusable == null || reusable.PixelWidth != frame.Width || reusable.PixelHeight != frame.Height)
+                    {
+                        reusable = frame.ToWriteableBitmap();
+                        Preview = reusable;
+                    }
+                    else
+                    {
+                        frame.ToWriteableBitmap(reusable);
+                    }
+                }));
             };
 
-            // 2. use Timer and GetBitmap().
-            //var timer = new System.Windows.Threading.DispatcherTimer();
-            //timer.Interval = TimeSpan.FromMilliseconds(1000.0 / 30);
-            //timer.Tick += (s, ev) => Preview = camera.GetBitmap();
-            //timer.Start();
-
-            // 3. use SetPreviewControl and WindowsFormshost. (works light, but you can't use WPF merit.)
-            // SetPreviewControl requires window handle but WPF control does not have handle.
-            // it is recommended to use PictureBox with WindowsFormsHost.
-            // or use handle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-            //var handle = pictureBox.Handle passed from MainWindow.xaml.
-            //camera.SetPreviewControl(handle, new System.Windows.Size(320, 240));
-
-            // start.
+            // Start streaming
             camera.Start();
 
-            GetBitmap = new RelayCommand(() => Capture = camera.GetBitmap());
+            // Capture current frame on demand
+            GetBitmap = new RelayCommand(() =>
+            {
+                var frame = camera.GetFrame();
+                if (frame != null)
+                {
+                    Capture = frame.ToBitmapSource();
+                }
+            });
 
+            // Still image support if available
             if (camera.StillImageAvailable)
             {
-                GetStillImage = new RelayCommand(() => camera.StillImageTrigger());
-                camera.StillImageCaptured += bmp => Capture = bmp;
+                GetStillImage = new RelayCommand(() => camera.TriggerStillImage());
+                camera.StillImageCaptured += frame =>
+                {
+                    System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        Capture = frame.ToBitmapSource();
+                    }));
+                };
             }
         }
     }

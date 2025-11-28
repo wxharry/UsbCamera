@@ -106,7 +106,12 @@ namespace UsbCamera
 
             // Wire up legacy bitmap events to VideoFrame events
             _camera.PreviewCaptured += OnLegacyPreviewCaptured;
-            _camera.StillImageCaptured += OnLegacyStillImageCaptured;
+            
+            // Only subscribe to still image events if camera supports it
+            if (_camera.StillImageAvailable)
+            {
+                _camera.StillImageCaptured += OnLegacyStillImageCaptured;
+            }
         }
 
         /// <summary>

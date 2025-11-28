@@ -60,6 +60,7 @@ namespace UsbCamera.Wpf
         /// <summary>
         /// Converts a VideoFrame to a WriteableBitmap, reusing an existing bitmap if provided.
         /// This minimizes allocations for high-frequency frame updates.
+        /// IMPORTANT: Must be called on the UI thread (Dispatcher thread).
         /// </summary>
         /// <param name="frame">Source video frame.</param>
         /// <param name="target">Optional existing WriteableBitmap to reuse. Must match frame dimensions.</param>
@@ -85,61 +86,49 @@ namespace UsbCamera.Wpf
                 target = new WriteableBitmap(frame.Width, frame.Height, Dpi, Dpi, pixelFormat, null);
             }
 
-            // Update the bitmap on the UI thread
-            Application.Current?.Dispatcher.Invoke(() =>
+            // Update the bitmap (caller must ensure we're on UI thread)
+            target.Lock();
+            try
             {
-                target.Lock();
-                try
+                if (frame.Format == PixelFormat.Bgr24)
                 {
-                    if (frame.Format == PixelFormat.Bgr24)
+                    CopyBgr24DataToLocked(frame, target);
+                }
+                else
+                {
+                    // Direct copy for Gray8/Gray16
+                    unsafe
                     {
-                        CopyBgr24DataToLocked(frame, target);
-                    }
-                    else
-                    {
-                        // Direct copy for Gray8/Gray16
-                        unsafe
+                        var src = frame.Data;
+                        var dst = (byte*)target.BackBuffer;
+                        for (int y = 0; y < frame.Height; y++)
                         {
-                            var src = frame.Data;
-                            var dst = (byte*)target.BackBuffer;
-                            for (int y = 0; y < frame.Height; y++)
-                            {
-                                System.Runtime.InteropServices.Marshal.Copy(
-                                    src, 
-                                    y * frame.Stride,
-                                    (IntPtr)(dst + y * target.BackBufferStride),
-                                    frame.Stride
-                                );
-                            }
+                            System.Runtime.InteropServices.Marshal.Copy(
+                                src, 
+                                y * frame.Stride,
+                                (IntPtr)(dst + y * target.BackBufferStride),
+                                frame.Stride
+                            );
                         }
                     }
-                    target.AddDirtyRect(new Int32Rect(0, 0, frame.Width, frame.Height));
                 }
-                finally
-                {
-                    target.Unlock();
-                }
-            });
+                target.AddDirtyRect(new Int32Rect(0, 0, frame.Width, frame.Height));
+            }
+            finally
+            {
+                target.Unlock();
+            }
 
             return target;
         }
 
         private static void CopyBgr24Data(VideoFrame frame, WriteableBitmap bitmap)
         {
-            var buffer = new byte[frame.Height * bitmap.BackBufferStride];
-            
-            // Convert from bottom-up to top-down
-            for (int y = 0; y < frame.Height; y++)
-            {
-                var srcIdx = frame.Data.Length - (frame.Stride * (y + 1));
-                var dstIdx = y * bitmap.BackBufferStride;
-                Buffer.BlockCopy(frame.Data, srcIdx, buffer, dstIdx, frame.Stride);
-            }
-
+            // Direct copy - data is already in correct orientation
             bitmap.WritePixels(
                 new Int32Rect(0, 0, frame.Width, frame.Height),
-                buffer,
-                bitmap.BackBufferStride,
+                frame.Data,
+                frame.Stride,
                 0
             );
         }
@@ -148,10 +137,10 @@ namespace UsbCamera.Wpf
         {
             var dst = (byte*)bitmap.BackBuffer;
             
-            // Convert from bottom-up to top-down
+            // Direct copy - data is already in correct orientation
             for (int y = 0; y < frame.Height; y++)
             {
-                var srcIdx = frame.Data.Length - (frame.Stride * (y + 1));
+                var srcIdx = y * frame.Stride;
                 var dstPtr = dst + (y * bitmap.BackBufferStride);
                 System.Runtime.InteropServices.Marshal.Copy(
                     frame.Data,
