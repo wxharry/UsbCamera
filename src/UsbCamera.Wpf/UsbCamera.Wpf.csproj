@@ -13,7 +13,7 @@
     <!-- NuGet Package Metadata -->
     <PackageId>UsbCamera.Wpf</PackageId>
     <Version>1.0.0</Version>
-    <Authors>secile</Authors>
+    <Authors>secile, Harry</Authors>
     <Description>WPF extensions for UsbCamera library. Provides VideoFrame to BitmapSource conversion.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/wxharry/UsbCamera</PackageProjectUrl>

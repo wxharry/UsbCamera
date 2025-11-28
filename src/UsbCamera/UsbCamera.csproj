@@ -11,7 +11,7 @@
     <!-- NuGet Package Metadata -->
     <PackageId>UsbCamera</PackageId>
     <Version>1.0.0</Version>
-    <Authors>secile</Authors>
+    <Authors>secile, Harry</Authors>
     <Description>Windows USB camera capture library using DirectShow. Framework-agnostic core library.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/wxharry/UsbCamera</PackageProjectUrl>
