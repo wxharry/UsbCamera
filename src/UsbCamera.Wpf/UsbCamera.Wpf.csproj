@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;net6.0-windows7.0</TargetFrameworks>
+    <RootNamespace>UsbCamera.Wpf</RootNamespace>
+    <AssemblyName>UsbCamera.Wpf</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWPF>true</UseWPF>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>UsbCamera.Wpf</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>secile</Authors>
+    <Description>WPF extensions for UsbCamera library. Provides VideoFrame to BitmapSource conversion.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/wxharry/UsbCamera</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wxharry/UsbCamera</RepositoryUrl>
+    <PackageTags>usb;camera;webcam;wpf;xaml;bitmapsource;video;capture;windows</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
+    <SupportedOSPlatform>windows7.0</SupportedOSPlatform>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UsbCamera\UsbCamera.csproj" />
+  </ItemGroup>
+
+</Project>

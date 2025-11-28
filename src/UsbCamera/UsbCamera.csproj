@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;net6.0-windows7.0</TargetFrameworks>
+    <RootNamespace>UsbCamera</RootNamespace>
+    <AssemblyName>UsbCamera</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>UsbCamera</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>secile</Authors>
+    <Description>Windows USB camera capture library using DirectShow. Framework-agnostic core library.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/wxharry/UsbCamera</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wxharry/UsbCamera</RepositoryUrl>
+    <PackageTags>usb;camera;webcam;directshow;video;capture;windows</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+	<UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
+    <SupportedOSPlatform>windows7.0</SupportedOSPlatform>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\UsbCamera.Net\UsbCamera.cs" Link="UsbCamera.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>

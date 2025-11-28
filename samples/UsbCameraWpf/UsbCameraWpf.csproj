@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;USBCAMERA_WPF</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,9 +33,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WPF|AnyCPU'">
-    <OutputPath>bin\WPF\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -105,9 +102,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\UsbCamera.Net\UsbCamera.Net.csproj">
-      <Project>{5e766494-a995-415a-9dff-60c3b34421a9}</Project>
-      <Name>UsbCamera.Net</Name>
+    <ProjectReference Include="..\..\src\UsbCamera.Wpf\UsbCamera.Wpf.csproj">
+      <Project>{a1b2c3d4-5678-90ab-cdef-1234567890ab}</Project>
+      <Name>UsbCamera.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\UsbCamera\UsbCamera.csproj">
+      <Project>{f5d4e8a1-1234-5678-90ab-cdef12345678}</Project>
+      <Name>UsbCamera</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

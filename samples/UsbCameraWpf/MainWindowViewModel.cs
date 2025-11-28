@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
+using System.Windows.Media;         // PixelFormats
+using System.Windows.Media.Imaging; // BitmapSource
 
 namespace UsbCameraWpf
 {
@@ -57,7 +58,7 @@ namespace UsbCameraWpf
 
             // to show preview, there are 3 ways.
             // 1. subscribe PreviewCaptured. (recommended.)
-            camera.PreviewCaptured += (bmp) =>
+            camera.PreviewCapturedWPF += (bmp) =>
             {
                 // Library currently built without USBCAMERA_WPF, convert System.Drawing.Bitmap to BitmapSource.
                 Preview = bmp;

@@ -32,9 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WinForms|AnyCPU'">
-    <OutputPath>bin\WPF\</OutputPath>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -83,9 +80,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\UsbCamera.Net\UsbCamera.Net.csproj">
-      <Project>{5e766494-a995-415a-9dff-60c3b34421a9}</Project>
-      <Name>UsbCamera.Net</Name>
+    <ProjectReference Include="..\..\src\UsbCamera.WinForms\UsbCamera.WinForms.csproj">
+      <Project>{b2c3d4e5-6789-01bc-def1-23456789abcd}</Project>
+      <Name>UsbCamera.WinForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\UsbCamera\UsbCamera.csproj">
+      <Project>{f5d4e8a1-1234-5678-90ab-cdef12345678}</Project>
+      <Name>UsbCamera</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
