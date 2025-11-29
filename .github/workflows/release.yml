@@ -18,6 +18,11 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Restore Solution
         run: msbuild UsbCamera.Net.sln /t:Restore /p:Configuration=Release /p:Platform="Any CPU"
 
@@ -31,6 +36,34 @@ jobs:
           New-Item -ItemType Directory -Force -Path packaged | Out-Null
           Compress-Archive -Path $outRoot/* -DestinationPath packaged/UsbCamera-${{ github.ref_name }}.zip
           Get-ChildItem packaged
+
+      - name: Compute package version from tag
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag -replace '^v',''
+          echo "PACKAGE_VERSION=$ver" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Pack NuGet (UsbCamera)
+        run: >-
+          msbuild src\UsbCamera\UsbCamera.csproj
+          /t:Pack
+          /p:Configuration=Release
+          /p:Platform="Any CPU"
+          /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+          /p:ContinuousIntegrationBuild=true
+          /p:IncludeSymbols=true
+          /p:SymbolPackageFormat=snupkg
+          /p:PackageOutputPath=out\nupkg
+
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: pwsh
+        run: |
+          if (-not $env:NUGET_API_KEY) { throw 'NUGET_API_KEY secret is not set' }
+          dotnet nuget push "out/nupkg/*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          dotnet nuget push "out/nupkg/*.snupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
