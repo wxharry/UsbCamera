@@ -45,16 +45,32 @@ jobs:
           echo "PACKAGE_VERSION=$ver" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Pack NuGet (UsbCamera)
-        run: >-
-          msbuild src\UsbCamera\UsbCamera.csproj
-          /t:Pack
-          /p:Configuration=Release
-          /p:Platform="Any CPU"
-          /p:PackageVersion=${{ env.PACKAGE_VERSION }}
-          /p:ContinuousIntegrationBuild=true
-          /p:IncludeSymbols=true
-          /p:SymbolPackageFormat=snupkg
-          /p:PackageOutputPath=out\nupkg
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path out/nupkg | Out-Null
+          dotnet pack src/UsbCamera/UsbCamera.csproj -c Release -o out/nupkg `
+            -p:PackageVersion=${{ env.PACKAGE_VERSION }} `
+            -p:ContinuousIntegrationBuild=true `
+            -p:IncludeSymbols=true `
+            -p:SymbolPackageFormat=snupkg
+
+      - name: Pack NuGet (UsbCamera.Wpf)
+        shell: pwsh
+        run: |
+          dotnet pack src/UsbCamera.Wpf/UsbCamera.Wpf.csproj -c Release -o out/nupkg `
+            -p:PackageVersion=${{ env.PACKAGE_VERSION }} `
+            -p:ContinuousIntegrationBuild=true `
+            -p:IncludeSymbols=true `
+            -p:SymbolPackageFormat=snupkg
+
+      - name: Pack NuGet (UsbCamera.WinForms)
+        shell: pwsh
+        run: |
+          dotnet pack src/UsbCamera.WinForms/UsbCamera.WinForms.csproj -c Release -o out/nupkg `
+            -p:PackageVersion=${{ env.PACKAGE_VERSION }} `
+            -p:ContinuousIntegrationBuild=true `
+            -p:IncludeSymbols=true `
+            -p:SymbolPackageFormat=snupkg
 
       - name: Publish to NuGet.org
         env:
@@ -62,8 +78,16 @@ jobs:
         shell: pwsh
         run: |
           if (-not $env:NUGET_API_KEY) { throw 'NUGET_API_KEY secret is not set' }
-          dotnet nuget push "out/nupkg/*.nupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          dotnet nuget push "out/nupkg/*.snupkg" --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          if (-not (Test-Path out/nupkg)) { throw 'NuGet output folder missing: out/nupkg' }
+          $nupkgs = Get-ChildItem out/nupkg -Filter *.nupkg
+          if (-not $nupkgs) { throw 'No .nupkg produced in out/nupkg' }
+          foreach ($pkg in $nupkgs) {
+            dotnet nuget push $pkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
+          $snupkgs = Get-ChildItem out/nupkg -Filter *.snupkg
+          foreach ($spkg in $snupkgs) {
+            dotnet nuget push $spkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
