@@ -73,22 +73,22 @@ jobs:
             -p:IncludeSymbols=true `
             -p:SymbolPackageFormat=snupkg
 
-      # - name: Publish to NuGet.org
-      #   env:
-      #     NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      #   shell: pwsh
-      #   run: |
-      #     if (-not $env:NUGET_API_KEY) { throw 'NUGET_API_KEY secret is not set' }
-      #     if (-not (Test-Path out/nupkg)) { throw 'NuGet output folder missing: out/nupkg' }
-      #     $nupkgs = Get-ChildItem out/nupkg -Filter *.nupkg
-      #     if (-not $nupkgs) { throw 'No .nupkg produced in out/nupkg' }
-      #     foreach ($pkg in $nupkgs) {
-      #       dotnet nuget push $pkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-      #     }
-      #     $snupkgs = Get-ChildItem out/nupkg -Filter *.snupkg
-      #     foreach ($spkg in $snupkgs) {
-      #       dotnet nuget push $spkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-      #     }
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: pwsh
+        run: |
+          if (-not $env:NUGET_API_KEY) { throw 'NUGET_API_KEY secret is not set' }
+          if (-not (Test-Path out/nupkg)) { throw 'NuGet output folder missing: out/nupkg' }
+          $nupkgs = Get-ChildItem out/nupkg -Filter *.nupkg
+          if (-not $nupkgs) { throw 'No .nupkg produced in out/nupkg' }
+          foreach ($pkg in $nupkgs) {
+            dotnet nuget push $pkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
+          $snupkgs = Get-ChildItem out/nupkg -Filter *.snupkg
+          foreach ($spkg in $snupkgs) {
+            dotnet nuget push $spkg.FullName --api-key "$env:NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
