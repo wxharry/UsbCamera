@@ -12,8 +12,26 @@ jobs:
   release:
     runs-on: windows-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Restore Solution
+        run: msbuild UsbCamera.Net.sln /t:Restore /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Build Solution (Release)
+        run: msbuild UsbCamera.Net.sln /m /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Package Artifacts
+        shell: pwsh
+        run: |
+          $outRoot = "src/UsbCamera/bin/Release"
+          New-Item -ItemType Directory -Force -Path packaged | Out-Null
+          Compress-Archive -Path $outRoot/* -DestinationPath packaged/UsbCamera-${{ github.ref_name }}.zip
+          Get-ChildItem packaged
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -21,5 +39,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
+          files: |
+            packaged/UsbCamera-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

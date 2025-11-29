@@ -25,9 +25,3 @@ jobs:
       - name: Build (MSBuild)
         run: msbuild UsbCamera.Net.sln /m /p:Configuration=${{ matrix.configuration }} /p:Platform="Any CPU"
 
-      - name: Artifact (Release only)
-        if: matrix.configuration == 'Release'
-        run: |
-          mkdir artifacts
-          for /f %%f in ('dir /b src\UsbCamera\bin\Release') do echo %%f > artifacts\listing.txt
-
