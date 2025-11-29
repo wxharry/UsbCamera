@@ -10,8 +10,8 @@
     <IsPackable>true</IsPackable>
     
     <!-- NuGet Package Metadata -->
-    <PackageId>UsbCamera</PackageId>
-    <Version>0.0.2</Version>
+    <PackageId>UsbCamera.Core</PackageId>
+    <Version>0.0.3</Version>
     <Authors>secile, Harry</Authors>
     <Description>Windows USB camera capture library using DirectShow. Framework-agnostic core library.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

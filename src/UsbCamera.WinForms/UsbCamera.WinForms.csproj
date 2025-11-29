@@ -11,7 +11,7 @@
     
     <!-- NuGet Package Metadata -->
     <PackageId>UsbCamera.WinForms</PackageId>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>secile, Harry</Authors>
     <Description>Windows Forms extensions for UsbCamera library. Provides VideoFrame to Bitmap conversion.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
