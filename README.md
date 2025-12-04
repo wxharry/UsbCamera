@@ -1,4 +1,6 @@
 # UsbCamera
+![NuGet Version](https://img.shields.io/nuget/v/usbcamera.core?color=darkviolet)
+
 Windows USB camera capture library using DirectShow, with a framework-agnostic core and adapters for WPF and WinForms.
 
 What’s included
